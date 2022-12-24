@@ -61,13 +61,15 @@ def getnextvalve(currentpath):
             nodenelf.append(k)
     return nodenelf
 
-def complete(total):
+def complete(total,stop=False):
     firstcave='AA'
     firstpath=path(total,firstcave)
     stack=[firstpath]
     completepaths=[]
     while stack!=[]:
         cpath=stack.pop(0)
+        if stop:
+            completepaths.append(cpath)
         newpaths=[]
         for nex in getnextvalve(cpath):
             nextnum=bridge[nex]
@@ -82,7 +84,8 @@ def complete(total):
         if newpaths!=[]:
             stack=stack+newpaths
         else:
-            completepaths.append(cpath)
+            if not stop:
+                completepaths.append(cpath)
     return completepaths
 
 
@@ -148,18 +151,25 @@ for i in nodenam:
     if allv[i].get_rate()!=0:
         nodename.append(i)
 
-c=complete(30)
-p=[]
+c=complete(26,True)
+p={}
+vi={}
+please=[]
+countelf=0
+
+#print(len(c))
 
 for i in c:
-    p.append(i.getpressure())
+    v=i.getvisited()
+    if 'AA' in v:
+        v.remove('AA')
+    p=i.getpressure()
+    for t in c:
+        vt=t.getvisited()
+        if 'AA' in vt:
+            vt.remove('AA')
+        pt=t.getpressure()
+        if set(v).isdisjoint(set(vt)) and p+pt>2000:
+            please.append(p+pt)
     
-print(max(p))
-
-
-
-
-
-
-
-
+print(max(please))
